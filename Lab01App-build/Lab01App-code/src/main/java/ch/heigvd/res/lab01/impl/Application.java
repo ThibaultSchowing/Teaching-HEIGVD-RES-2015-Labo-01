@@ -10,7 +10,6 @@ import ch.heigvd.res.lab01.quotes.Quote;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.logging.Level;
@@ -125,7 +124,21 @@ public class Application implements IApplication {
    * @throws IOException 
    */
   void storeQuote(Quote quote, String filename) throws IOException {
-    throw new UnsupportedOperationException("The student has not implemented this method yet.");
+    //throw new UnsupportedOperationException("The student has not implemented this method yet.");
+      String[] tags = quote.getTags();
+      String rep = "./quotes/";
+      
+      // Création des répertoires
+//      for(String s: tags){
+//          new File(rep + s).mkdirs();
+//          rep = rep.concat(s);    // Ajoute le répertoire créé à rep pour l'ajouter au path
+//      }
+      for(String s: tags){
+          rep = rep.concat(s + "/");
+          System.out.println(rep);
+      }
+      
+      FileUtils.writeStringToFile(new File((rep), filename),quote.getQuote(),"utf-8");
   }
   
   /**
@@ -137,18 +150,34 @@ public class Application implements IApplication {
     explorer.explore(new File(WORKSPACE_DIRECTORY), new IFileVisitor() {
       @Override
       public void visit(File file) {
-        /*
-         * There is a missing piece here. Notice how we use an anonymous class here. We provide the implementation
-         * of the the IFileVisitor interface inline. You just have to add the body of the visit method, which should
-         * be pretty easy (we want to write the filename, including the path, to the writer passed in argument).
-         */
+          try {
+              /*
+              * There is a missing piece here. Notice how we use an anonymous class here. We provide the implementation
+              * of the the IFileVisitor interface inline. You just have to add the body of the visit method, which should
+              * be pretty easy (we want to write the filename, including the path, to the writer passed in argument).
+              */
+              String s;
+              if(file.isDirectory()){
+                  s = file.toPath().toString();
+              }
+            else{
+                  s = "./" + file.toPath().normalize().toString();
+              }
+              s = s.replace("\\","/");
+              System.out.println(s);
+              writer.write(s + "\n");
+          } catch (IOException ex) {
+              System.out.println("Shit happens");
+              Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+          }
       }
     });
   }
   
   @Override
   public String getAuthorEmail() {
-    throw new UnsupportedOperationException("The student has not implemented this method yet.");
+    //throw new UnsupportedOperationException("The student has not implemented this method yet.");
+      return "thibault.schowing@heig-vd.ch";
   }
 
   @Override
