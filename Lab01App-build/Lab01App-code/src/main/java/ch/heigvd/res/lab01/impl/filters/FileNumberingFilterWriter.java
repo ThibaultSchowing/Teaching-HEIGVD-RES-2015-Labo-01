@@ -1,5 +1,6 @@
 package ch.heigvd.res.lab01.impl.filters;
 
+import ch.heigvd.res.lab01.impl.Utils;
 import java.io.BufferedReader;
 import java.io.FilterWriter;
 import java.io.IOException;
@@ -24,28 +25,56 @@ public class FileNumberingFilterWriter extends FilterWriter {
     public FileNumberingFilterWriter(Writer out) {
         super(out);
     }
+    private int noline = 1;
+    private String ligne;
 
     @Override
     public void write(String str, int off, int len) throws IOException {
-        throw new UnsupportedOperationException("The student has not implemented this method yet.");
+        //throw new UnsupportedOperationException("The student has not implemented this method yet.");
 
-//        BufferedReader bufReader = new BufferedReader(new StringReader(str));
-//
-//        String line = null;
-//        String temp = null;
-//        String result = "";
-//        int i = 0;
-//        while ((line = bufReader.readLine()) != null) {
-//            temp = i + "\t" + line;
-//            result += temp + "\n";
-//            i++;
+        String str2 = str.substring(off, off + len);
+        BufferedReader bufReader = new BufferedReader(new StringReader(str2));
+        
+        String[] line = null;
+        String temp = null;
+        String result = "";
+        
+        Boolean contienRetour = false;
+        
+        line = Utils.getNextLine(str2);
+        
+        while (!line[0].equals("")) { 
+            temp = noline + "\t" + line[0];
+            result += temp;
+            noline++;
+            
+            if(line[0].contains("\n") || line[0].contains("\r")){
+                contienRetour = true;
+            }
+            else{
+                contienRetour = false;
+            }
+            line = Utils.getNextLine(line[1]);
+            
+            // S'il y a un retour à la ligne dans la dernière ligne, il faut faire une nouvelle ligne avec juste un numéro
+
+        }
+        if (contienRetour)
+            result += noline + "\t" + line[1];
+        System.out.println(result);
+        
+//        if(contienRetour){
+//            result += noline + "\t" + line[1];
 //        }
-//        out.write(result,off,len);
+        
+        super.write(result,0,result.length());
     }
 
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
-        throw new UnsupportedOperationException("The student has not implemented this method yet.");
+        //throw new UnsupportedOperationException("The student has not implemented this method yet.");
+        String s = new String(cbuf);
+        write(s,off,len);
     }
 
     @Override

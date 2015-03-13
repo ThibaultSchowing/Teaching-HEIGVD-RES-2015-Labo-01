@@ -172,7 +172,7 @@ public class Application implements IApplication {
                     writer.write(s + "\n");
                 } catch (IOException ex) {
                     System.out.println("Shit happens");
-                    Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
+                    //Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
