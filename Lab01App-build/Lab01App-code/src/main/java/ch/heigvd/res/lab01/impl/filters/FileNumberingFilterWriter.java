@@ -27,47 +27,37 @@ public class FileNumberingFilterWriter extends FilterWriter {
     }
     private int noline = 1;
     private String ligne;
+    private boolean charRetour = false;
+    private boolean firstLine = true;
+    
+    private String nextLine(){
+        return noline++ + "\t";
+    }
 
     @Override
     public void write(String str, int off, int len) throws IOException {
         //throw new UnsupportedOperationException("The student has not implemented this method yet.");
-
-        String str2 = str.substring(off, off + len);
-        BufferedReader bufReader = new BufferedReader(new StringReader(str2));
-        
-        String[] line = null;
-        String temp = null;
-        String result = "";
-        
-        Boolean contienRetour = false;
-        
-        line = Utils.getNextLine(str2);
-        
-        while (!line[0].equals("")) { 
-            temp = noline + "\t" + line[0];
-            result += temp;
-            noline++;
-            
-            if(line[0].contains("\n") || line[0].contains("\r")){
-                contienRetour = true;
-            }
-            else{
-                contienRetour = false;
-            }
-            line = Utils.getNextLine(line[1]);
-            
-            // S'il y a un retour à la ligne dans la dernière ligne, il faut faire une nouvelle ligne avec juste un numéro
-
+        if(firstLine){
+            ligne = nextLine();
+            out.write(ligne,0,ligne.length());
+            firstLine = false;
         }
-        if (contienRetour)
-            result += noline + "\t" + line[1];
-        System.out.println(result);
         
-//        if(contienRetour){
-//            result += noline + "\t" + line[1];
-//        }
+        String[] lines = Utils.getNextLine(str.substring(off,off+len));
+        if(lines[0].isEmpty()){
+            out.write(lines[1],0,lines[1].length());
+            return;
+        }
         
-        super.write(result,0,result.length());
+        while(!lines[0].isEmpty()){
+            out.write(lines[0],0,lines[0].length());
+            ligne = nextLine();
+            out.write(ligne,0,ligne.length());
+            lines = Utils.getNextLine(lines[1]);
+        }
+        if(!lines[1].isEmpty()){
+            out.write(lines[1],0,lines[1].length());
+        }
     }
 
     @Override
@@ -79,7 +69,20 @@ public class FileNumberingFilterWriter extends FilterWriter {
 
     @Override
     public void write(int c) throws IOException {
-        throw new UnsupportedOperationException("The student has not implemented this method yet.");
+        //throw new UnsupportedOperationException("The student has not implemented this method yet.");
+        // Le caractère précédent était un retour, pas besoin d'écrire le no de ligne
+        if (firstLine){
+            out.write(noline++ + "\t");
+            firstLine = false;
+        }
+        if((char)c == '\n' || (char)c == '\r'){
+            charRetour = true;
+        } else if (charRetour ){
+            out.write(noline++ + "\t");
+            charRetour = false;
+        } 
+        
+        out.write(c);
     }
 
 }
